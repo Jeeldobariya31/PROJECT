@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simple Calculator</title>
+  <link rel="stylesheet" href="calc.css">
+</head>
+<body>
+  <div class="main">
+    <div class="parta">
+      <h1>Simple Calculator</h1>
+    </div>
+    <div class="middle">
+      <div class="display" id="display"></div>
+      <div class="key">
+        <button onclick="append('7')">⓻</button>
+        <button onclick="append('8')">⓼</button>
+        <button onclick="append('9')">⓽</button>
+        <button class="operator" onclick="append('/')">/</button>
+
+        <button onclick="append('4')">⓸</button>
+        <button onclick="append('5')">⓹</button>
+        <button onclick="append('6')">⓺</button>
+        <button class="operator" onclick="append('*')">*</button>
+
+        <button onclick="append('1')">⓵</button>
+        <button onclick="append('2')">⓶</button>
+        <button onclick="append('3')">⓷</button>
+        <button class="operator" onclick="append('-')">-</button>
+
+        <button onclick="append('0')">⓿</button>
+        <button onclick="append('.')">•</button>
+        <button class="equal" onclick="calculate()">=</button>
+        <button class="operator" onclick="append('+')">+</button>
+
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button class="clear" onclick="backs()">◄</button>
+      </div>
+    </div>
+  </div>
+<script src="calc.js"></script>
+</body>
+</html>

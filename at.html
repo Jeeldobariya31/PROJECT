@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attendance System</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      text-align: center;
+      background-color: #4f46e5;
+      color: white;
+      padding: 1rem;
+    }
+
+    .header button {
+      background-color: white;
+      color: #726fa0;
+      border: none;
+      padding: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    #dis {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      margin: auto;
+      height: 60px;
+      width: 60px;
+      font-size: 32px;
+      color: #dc2626;
+      background-color: rgb(224, 224, 207);
+      text-align: center;
+      border: 3px solid black;
+      line-height: 60px;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+      width: 18rem;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card.focused {
+      background-color: #e0f2fe;
+      box-shadow: 0 0 10px #2563eb;
+    }
+
+    .card h5 {
+      margin: 0.5rem 0;
+      color: #1f2937;
+    }
+
+    .card h6 {
+      margin: 0.3rem 0;
+      color: #6b7280;
+    }
+
+    .card-text {
+      margin-bottom: 0.5rem;
+      color: #374151;
+    }
+
+    #actions {
+      text-align: center;
+      margin: 1rem;
+    }
+
+    #actions button {
+      margin: 0.3rem;
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .summary {
+      margin-top: 1rem;
+      font-size: 1.1rem;
+      color: #111827;
+    }
+
+    #note{
+      color: gold;
+      font-size: 32px;
+    }
+
+    .output {
+      background-color: #fff;
+      padding: 1rem;
+      margin: 1rem auto;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #dc2626;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🎓 Student Attendance</h1>
+  <button onclick="show1()" id="3a">3A</button>
+  <button onclick="show2()" id="3b">3B</button>
+  <div id="d1" style="display: none;">
+    <button onclick="generate_1()">Load Students (101 - 200)</button>
+    <button onclick="generate_2()">Load Students (201 - 280)</button>
+  </div>
+  <div id="d2" style="display: none;">
+    <button onclick="generate_3()">Load Students (301 - 429)</button>
+  </div >
+  <div id="note" style="display:block ;">
+  <h6>=> Here All Name Is As Per Du Student List 2025-26 Class 3A </h6>
+  <h6 >=> If You Have Any Doubt Than You Meet Admin Office </h6>
+  <h6 >=> press up arrow to marked</h6>
+  <h6 >=> press down arrow to unmarked</h6>
+  <h6>=> press left arrow to go left</h6>
+  <h6 >=> press right arrow to go right</h6>
+  </div>
+</div>
+
+<div id="dis" style="display: none;">---</div>
+
+<div id="list" class="container"></div>
+
+<div id="actions" style="display: none;">
+  <button onclick="mark(true)">Mark All Present</button>
+  <button onclick="reset()">Reset</button>
+  <button onclick="submit()">Submit</button>
+  <div class="summary">
+    Present: <span id="present">0</span> |
+    Absent: <span id="absent">0</span>
+  </div>
+</div>
+
+<div id="output" class="output" style="display: none;"></div>
+
+<script src="student.js"></script>
+<script>
+  let dis = document.getElementById("dis");
+  let focusedIndex = 0;
+  let rollNos = [];
+  let data = [];
+
+  function show1() {
+    dis.innerHTML = "---";
+    document.getElementById("list").innerHTML = "";
+    document.getElementById("d1").style.display = "block";
+    document.getElementById("d2").style.display = "none";
+    document.getElementById("note").style.display = "none";
+  }
+
+  function show2() {
+    dis.innerHTML = "---";
+    document.getElementById("list").innerHTML = "";
+    document.getElementById("d2").style.display = "block";
+    document.getElementById("d1").style.display = "none";
+    document.getElementById("note").style.display = "none";
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (rollNos.length === 0) return;
+
+    const currentId = "r" + rollNos[focusedIndex];
+    const currentCheckbox = document.getElementById(currentId);
+    if (!currentCheckbox) return;
+
+    switch (e.key) {
+      case "ArrowRight":
+        e.preventDefault();
+        if (focusedIndex < rollNos.length - 1) {
+          focusedIndex++;
+          document.getElementById("r" + rollNos[focusedIndex]).focus();
+        }
+        break;
+
+      case "ArrowLeft":
+        e.preventDefault();
+        if (focusedIndex > 0) {
+          focusedIndex--;
+          document.getElementById("r" + rollNos[focusedIndex]).focus();
+        }
+        break;
+
+      case "ArrowUp":
+        e.preventDefault();
+        currentCheckbox.checked = true;
+        update();
+        break;
+
+      case "ArrowDown":
+        e.preventDefault();
+        currentCheckbox.checked = false;
+        update();
+        break;
+    }
+
+    const currentRoll = data[rollNos[focusedIndex]]?.rollNo || "---";
+    dis.innerHTML = currentRoll;
+  });
+
+  function generateList(start, end, source) {
+    dis.style.display = "block";
+    focusedIndex = 0;
+    data = source;
+    rollNos = [];
+    const list = document.getElementById("list");
+    list.innerHTML = "";
+    document.getElementById("actions").style.display = "none";
+    document.getElementById("output").style.display = "none";
+
+    for (let i = start; i <= end; i++) {
+      rollNos.push(i);
+      setTimeout(() => {
+        list.innerHTML += `<div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Roll No: ${source[i].rollNo}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Enrollment No: ${source[i].enrollmentNo}</h6>
+            <p class="card-text">Student Name: ${source[i].name}</p>
+            <input type="checkbox" id="r${i}" tabindex="0" onchange="update()" 
+              onfocus="highlightCard(this)" onblur="unhighlightCard(this)">
+          </div>
+        </div>`;
+      }, (i - start) * 20);
+    }
+
+    setTimeout(() => {
+  document.getElementById("actions").style.display = "block";
+  dis.innerHTML = source[rollNos[focusedIndex]].rollNo;
+  update();
+  // ✅ Auto-focus the first student checkbox
+  document.getElementById("r" + rollNos[0])?.focus();
+}, (end - start + 1) * 20 + 100);
+
+  }
+
+  function generate_1() { generateList(0, 99, students); }
+  function generate_2() { generateList(100, 179, students); }
+  function generate_3() { generateList(0, 128, students1); }
+
+  function highlightCard(checkbox) {
+    checkbox.closest('.card').classList.add("focused");
+  }
+
+  function unhighlightCard(checkbox) {
+    checkbox.closest('.card').classList.remove("focused");
+  }
+
+  function update() {
+    let present = 0;
+    rollNos.forEach((r) => {
+      if (document.getElementById("r" + r)?.checked) {
+        present++;
+      }
+    });
+    document.getElementById("present").textContent = present;
+    document.getElementById("absent").textContent = rollNos.length - present;
+  }
+
+  function mark(state) {
+    rollNos.forEach((r) => {
+      const checkbox = document.getElementById("r" + r);
+      if (checkbox) checkbox.checked = state;
+    });
+    update();
+  }
+
+  function reset() {
+    mark(false);
+  }
+
+  function submit() {
+    const absents = rollNos.filter(
+      (r) => !document.getElementById("r" + r).checked
+    );
+    const output = document.getElementById("output");
+    output.style.display = "block";
+    output.textContent =
+      absents.length === 0
+        ? "🎉 All students are present!"
+        : "Absent Roll Numbers:\n" + absents.map(i => data[i].rollNo).join(", ");
+  }
+</script>
+
+</body>
+</html>
